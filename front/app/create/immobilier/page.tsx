@@ -1,70 +1,76 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { Building2, Home, KeyRound } from "lucide-react";
 
-const modes = [
-  {
-    id: "achat",
-    title: "Achat en partenariat",
-    desc: "Acheter un terrain ou appartement avec un partenaire.",
-    icon: "💰",
-  },
-  {
-    id: "construction",
-    title: "Construction",
-    desc: "Construire sur un terrain existant avec des associés.",
-    icon: "🏗️",
-  },
-  {
-    id: "gestion",
-    title: "Gestion Airbnb",
-    desc: "Confier la gestion d’un bien à un partenaire.",
-    icon: "🏠",
-  },
-  {
-    id: "sous-location",
-    title: "Sous-location",
-    desc: "Chercher un partenaire pour exploiter un bien.",
-    icon: "🔑",
-  },
-];
-
-export default function ImmobilierModePage() {
+export default function ImmobilierMenuPage() {
   const router = useRouter();
 
+  const options = [
+    {
+      title: "Achat en partenariat",
+      description:
+        "Achetez un bien avec un partenaire et partagez investissement et bénéfices.",
+      icon: <Building2 className="w-6 h-6 text-blue-600" />,
+      path: "immobilier/achat",
+    },
+    {
+      title: "Gestion Airbnb",
+      description:
+        "Confiez la gestion de votre bien Airbnb à un partenaire et maximisez vos revenus.",
+      icon: <Home className="w-6 h-6 text-blue-600" />,
+      path: "immobilier/airbnb",
+    },
+    {
+      title: "Sous-location",
+      description:
+        "Trouvez un partenaire pour exploiter un bien en sous-location.",
+      icon: <KeyRound className="w-6 h-6 text-blue-600" />,
+      path: "immobilier/sous-location",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-50 py-16 px-6">
+    <div className="px-6 pt-10 pb-16">
       <div className="max-w-5xl mx-auto">
 
-        <h1 className="text-3xl font-bold text-slate-900 mb-4">
-          Quel type de projet immobilier ?
-        </h1>
+        {/* Title */}
+        <div className="mb-10">
+          <span className="text-sm font-semibold text-blue-600 uppercase">
+            Immobilier
+          </span>
 
-        <p className="text-slate-500 mb-10">
-          Choisissez le scénario qui correspond à votre besoin.
-        </p>
+          <h1 className="text-3xl font-bold text-gray-900 mt-2">
+            Choisissez le type d’opportunité immobilière
+          </h1>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {modes.map((mode) => (
-            <div
-              key={mode.id}
-              onClick={() =>
-                router.push(`/create/immobilier/${mode.id}`)
-              }
-              className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-indigo-400 transition cursor-pointer"
+          <p className="text-gray-500 mt-2">
+            Sélectionnez le type de partenariat immobilier que vous souhaitez créer.
+          </p>
+        </div>
+
+        {/* Cards */}
+        <div className="grid gap-6 md:grid-cols-3">
+          {options.map((option) => (
+            <button
+              key={option.title}
+              onClick={() => router.push(option.path)}
+              className="bg-white border border-gray-200 rounded-xl p-6 text-left hover:border-blue-500 hover:shadow-md transition"
             >
-              <div className="text-3xl mb-3">{mode.icon}</div>
+              <div className="flex items-center gap-3 mb-3">
+                {option.icon}
+                <h3 className="font-semibold text-gray-900">
+                  {option.title}
+                </h3>
+              </div>
 
-              <h3 className="font-semibold text-lg text-slate-800">
-                {mode.title}
-              </h3>
-
-              <p className="text-sm text-slate-500 mt-2">
-                {mode.desc}
+              <p className="text-sm text-gray-500">
+                {option.description}
               </p>
-            </div>
+            </button>
           ))}
         </div>
+
       </div>
     </div>
   );
