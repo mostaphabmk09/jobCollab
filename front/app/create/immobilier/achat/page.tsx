@@ -2,265 +2,322 @@
 
 import { useState } from "react";
 
-export default function AchatPartenariatPage() {
+export default function AchatPage() {
+
+const [mode, setMode] = useState("define");
+
+const [form, setForm] = useState({
+city: "",
+propertyType: "",
+purpose: "",
+totalBudget: "",
+partners: "",
+title: "",
+description: ""
+});
+
+const investment =
+form.totalBudget && form.partners
+? Number(form.totalBudget) / Number(form.partners)
+: 0;
 
-  const [mode, setMode] = useState("define");
+const handleChange = (e:any) => {
+setForm({
+...form,
+[e.target.name]: e.target.value
+});
+};
 
-  const [form, setForm] = useState({
-    city: "",
-    propertyType: "",
-    totalBudget: "",
-    partners: "",
-    title: "",
-    description: "",
-  });
+return (
 
-  const investment =
-    form.totalBudget && form.partners
-      ? Number(form.totalBudget) / Number(form.partners)
-      : 0;
+<div className="bg-gray-50 min-h-screen py-10 px-6">
 
-  const handleChange = (e: any) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
+<div className="max-w-7xl mx-auto grid md:grid-cols-12 gap-8">
 
-  return (
-    <div className="px-6 py-12 bg-gray-50 min-h-screen">
+{/* FORM */}
 
-      <div className="max-w-4xl mx-auto">
+<div className="md:col-span-8">
 
-        {/* Header */}
+<div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-8">
 
-        <div className="mb-8">
+{/* HEADER */}
 
-          <span className="text-xs font-semibold text-orange-500 uppercase">
-            Immobilier
-          </span>
+<div>
 
-          <h1 className="text-2xl font-semibold mt-2">
-            Achat en partenariat
-          </h1>
+<p className="text-xs font-semibold text-orange-500 uppercase">
+Immobilier
+</p>
 
-          <p className="text-gray-500 text-sm mt-1">
-            Publiez une opportunité pour acheter un bien avec un partenaire.
-          </p>
+<h1 className="text-2xl font-semibold mt-1">
+Créer une opportunité d'achat
+</h1>
 
-        </div>
+<p className="text-sm text-gray-500 mt-1">
+Trouvez un partenaire pour investir dans un bien immobilier.
+</p>
 
-        {/* Form Card */}
+</div>
 
-        <div className="bg-white border border-gray-200 rounded-2xl p-8 space-y-8 shadow-sm">
+{/* PROPERTY INFO */}
 
-          {/* Informations */}
+<div>
 
-          <div>
+<h2 className="text-sm font-semibold mb-4">
+Informations du bien
+</h2>
 
-            <h2 className="text-sm font-semibold mb-5">
-              Informations du bien
-            </h2>
+<div className="grid md:grid-cols-2 gap-4">
 
-            <div className="grid md:grid-cols-2 gap-4">
+<select
+name="city"
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+>
+<option value="">Ville</option>
+<option>Casablanca</option>
+<option>Marrakech</option>
+<option>Rabat</option>
+<option>Tanger</option>
+<option>Agadir</option>
+</select>
 
-              <div>
+<select
+name="propertyType"
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+>
+<option value="">Type de bien</option>
+<option>Appartement</option>
+<option>Villa</option>
+<option>Riad</option>
+<option>Studio</option>
+<option>Terrain</option>
+</select>
 
-                <label className="text-xs text-gray-500 mb-1 block">
-                  Ville
-                </label>
+<select
+name="purpose"
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm md:col-span-2"
+>
+<option value="">Objectif du projet</option>
+<option>Location longue durée</option>
+<option>Location Airbnb</option>
+<option>Achat pour revente</option>
+<option>Projet mixte</option>
+</select>
 
-                <select
-                  name="city"
-                  onChange={handleChange}
-                  className="w-full border rounded-lg px-3 py-2 text-sm bg-white"
-                >
+</div>
 
-                  <option>Choisir une ville</option>
-                  <option>Casablanca</option>
-                  <option>Marrakech</option>
-                  <option>Rabat</option>
-                  <option>Tanger</option>
-                  <option>Agadir</option>
+</div>
 
-                </select>
+<hr className="border-gray-100"/>
 
-              </div>
+{/* INVESTMENT */}
 
-              <div>
+<div>
 
-                <label className="text-xs text-gray-500 mb-1 block">
-                  Type de bien
-                </label>
+<h2 className="text-sm font-semibold mb-4">
+Investissement
+</h2>
 
-                <select
-                  name="propertyType"
-                  onChange={handleChange}
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
-                >
+<div className="flex gap-6 mb-6">
 
-                  <option>Type</option>
-                  <option>Appartement</option>
-                  <option>Villa</option>
-                  <option>Riad</option>
-                  <option>Studio</option>
-                  <option>Terrain</option>
+<label className="flex items-center gap-2 text-sm">
 
-                </select>
+<input
+type="radio"
+checked={mode === "define"}
+onChange={() => setMode("define")}
+/>
 
-              </div>
+Définir l’investissement
 
-            </div>
+</label>
 
-          </div>
+<label className="flex items-center gap-2 text-sm">
 
-          {/* Investissement */}
+<input
+type="radio"
+checked={mode === "discuss"}
+onChange={() => setMode("discuss")}
+/>
 
-          <div className="border-t pt-6">
+Discuter avec le partenaire
 
-            <h2 className="text-sm font-semibold mb-4">
-              Investissement
-            </h2>
+</label>
 
-            <div className="flex gap-6 mb-6">
+</div>
 
-              <label className="flex items-center gap-2 text-sm">
+{mode === "define" && (
 
-                <input
-                  type="radio"
-                  checked={mode === "define"}
-                  onChange={() => setMode("define")}
-                />
+<div className="grid md:grid-cols-2 gap-4">
 
-                Définir l’investissement
+<input
+type="number"
+name="totalBudget"
+placeholder="Budget total"
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+/>
 
-              </label>
+<input
+type="number"
+name="partners"
+placeholder="Nombre investisseurs"
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+/>
 
-              <label className="flex items-center gap-2 text-sm">
+</div>
 
-                <input
-                  type="radio"
-                  checked={mode === "discuss"}
-                  onChange={() => setMode("discuss")}
-                />
+)}
 
-                Discuter avec le partenaire
+{/* CALCUL */}
 
-              </label>
+{mode === "define" && investment > 0 && (
 
-            </div>
+<div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
 
-            {mode === "define" && (
+<p className="text-xs text-blue-600 font-medium mb-1">
+Calcul automatique
+</p>
 
-              <div className="grid md:grid-cols-2 gap-4">
+<p className="text-sm">
 
-                <div>
+Chaque investisseur doit apporter
 
-                  <label className="text-xs text-gray-500 mb-1 block">
-                    Budget total
-                  </label>
+<span className="font-semibold ml-2">
+{investment.toLocaleString()} DH
+</span>
 
-                  <input
-                    type="number"
-                    name="totalBudget"
-                    placeholder="1000000"
-                    onChange={handleChange}
-                    className="w-full border rounded-lg px-3 py-2 text-sm"
-                  />
+</p>
 
-                </div>
+</div>
 
-                <div>
+)}
 
-                  <label className="text-xs text-gray-500 mb-1 block">
-                    Investisseurs (vous inclus)
-                  </label>
+{mode === "discuss" && (
 
-                  <input
-                    type="number"
-                    name="partners"
-                    placeholder="2"
-                    onChange={handleChange}
-                    className="w-full border rounded-lg px-3 py-2 text-sm"
-                  />
+<p className="text-sm text-gray-500">
+Les conditions d’investissement seront discutées avec le partenaire.
+</p>
 
-                </div>
+)}
 
-              </div>
+</div>
 
-            )}
+<hr className="border-gray-100"/>
 
-            {mode === "define" && investment > 0 && (
+{/* DESCRIPTION */}
 
-              <div className="mt-4 bg-gray-100 border rounded-lg px-4 py-3 text-sm">
+<div>
 
-                Chaque investisseur apporte
-                <span className="font-semibold ml-2">
-                  {investment.toLocaleString()} DH
-                </span>
+<h2 className="text-sm font-semibold mb-4">
+Description
+</h2>
 
-              </div>
+<div className="space-y-4">
 
-            )}
+<input
+name="title"
+placeholder="Titre de l’opportunité"
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
+/>
 
-            {mode === "discuss" && (
+<textarea
+name="description"
+rows={4}
+placeholder="Décrivez votre projet..."
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
+/>
 
-              <div className="text-sm text-gray-500">
+</div>
 
-                Les conditions d’investissement seront discutées directement
-                avec les partenaires intéressés.
+</div>
 
-              </div>
+{/* BUTTON */}
 
-            )}
+<div className="flex justify-end pt-4 border-t border-gray-100">
 
-          </div>
+<button
+type="submit"
+className="bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition"
+>
+Publier l’opportunité
+</button>
 
-          {/* Description */}
+</div>
 
-          <div className="border-t pt-6">
+</div>
 
-            <h2 className="text-sm font-semibold mb-4">
-              Description
-            </h2>
+</div>
 
-            <div className="space-y-4">
+{/* PREVIEW */}
 
-              <input
-                name="title"
-                placeholder="Titre de l’opportunité"
-                onChange={handleChange}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
-              />
+<div className="md:col-span-4">
 
-              <textarea
-                name="description"
-                rows={4}
-                placeholder="Décrivez votre projet..."
-                onChange={handleChange}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
-              />
+<div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
 
-            </div>
+<p className="text-xs text-gray-400 mb-3">
+Aperçu de l'opportunité
+</p>
 
-          </div>
+<div className="space-y-3 text-sm">
 
-          {/* Submit */}
+{form.city && (
+<p>
+<span className="text-gray-500">Ville :</span> {form.city}
+</p>
+)}
 
-          <div className="flex justify-end pt-6 border-t">
+{form.propertyType && (
+<p>
+<span className="text-gray-500">Type :</span> {form.propertyType}
+</p>
+)}
 
-            <button className="bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700">
+{form.purpose && (
+<p>
+<span className="text-gray-500">Objectif :</span> {form.purpose}
+</p>
+)}
 
-              Publier l’opportunité
+{mode === "define" && form.totalBudget && (
+<p>
+<span className="text-gray-500">Budget :</span>{" "}
+{Number(form.totalBudget).toLocaleString()} DH
+</p>
+)}
 
-            </button>
+{mode === "define" && form.partners && (
+<p>
+<span className="text-gray-500">Investisseurs :</span> {form.partners}
+</p>
+)}
 
-          </div>
+{mode === "define" && investment > 0 && (
+<p className="font-medium">
+Par partenaire : {investment.toLocaleString()} DH
+</p>
+)}
 
-        </div>
+{mode === "discuss" && (
+<p className="text-gray-500">
+Investissement à discuter avec le partenaire
+</p>
+)}
 
-      </div>
+</div>
 
-    </div>
-  );
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+);
 }

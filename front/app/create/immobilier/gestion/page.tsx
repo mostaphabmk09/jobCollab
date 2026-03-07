@@ -2,133 +2,305 @@
 
 import { useState } from "react";
 
-export default function CreateGestionPage() {
-  const [managementType, setManagementType] = useState("complete");
-  const [commission, setCommission] = useState(20);
-  const [duration, setDuration] = useState(12);
+export default function GestionAirbnbPage() {
 
-  return (
-    <div className="min-h-screen bg-slate-50 py-12 px-6">
-      <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-10">
+const [form, setForm] = useState({
+city: "",
+district: "",
+propertyType: "",
+rooms: "",
+revenue: "",
+managementType: "",
+commission: "",
+airbnbLink: "",
+title: "",
+description: ""
+});
 
-        {/* LEFT */}
-        <div className="lg:col-span-2 space-y-8">
+const handleChange = (e:any) => {
+setForm({
+...form,
+[e.target.name]: e.target.value
+});
+};
 
-          <h1 className="text-3xl font-bold text-slate-900">
-            Gestion Airbnb / Location
-          </h1>
+const getManagementDescription = () => {
 
-          {/* Type gestion */}
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-            <h2 className="font-semibold text-lg">
-              Type de gestion recherchée
-            </h2>
+if (form.managementType === "complete")
+return "Le partenaire gère entièrement le bien : annonce, voyageurs, check-in et optimisation.";
 
-            <select
-              value={managementType}
-              onChange={(e) =>
-                setManagementType(e.target.value)
-              }
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm"
-            >
-              <option value="complete">
-                Gestion complète (clé en main)
-              </option>
-              <option value="ameublement">
-                Ameublement + mise en location
-              </option>
-              <option value="sous-location">
-                Sous-location
-              </option>
-            </select>
-          </div>
+if (form.managementType === "cohost")
+return "Le partenaire vous aide dans certaines tâches (messages, optimisation ou calendrier).";
 
-          {/* Infos bien */}
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-            <h2 className="font-semibold text-lg">
-              Informations du bien
-            </h2>
+if (form.managementType === "discuss")
+return "Les modalités de gestion seront définies avec le partenaire intéressé.";
 
-            <input
-              placeholder="Ville"
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm"
-            />
+return "";
 
-            <select className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">
-              <option>Appartement</option>
-              <option>Villa</option>
-              <option>Studio</option>
-              <option>Maison</option>
-            </select>
+};
 
-            <textarea
-              rows={4}
-              placeholder="Décrivez le bien (superficie, quartier, état...)"
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm"
-            />
-          </div>
+return (
 
-          {/* Conditions */}
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-            <h2 className="font-semibold text-lg">
-              Conditions de collaboration
-            </h2>
+<div className="bg-gray-50 min-h-screen py-10 px-6">
 
-            <div>
-              <label className="text-sm font-medium">
-                Commission proposée (%)
-              </label>
+<div className="max-w-7xl mx-auto grid md:grid-cols-12 gap-8">
 
-              <input
-                type="number"
-                value={commission}
-                onChange={(e) =>
-                  setCommission(Number(e.target.value))
-                }
-                className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm"
-              />
-            </div>
+{/* FORM */}
 
-            <div>
-              <label className="text-sm font-medium">
-                Durée du contrat (mois)
-              </label>
+<div className="md:col-span-8">
 
-              <input
-                type="number"
-                value={duration}
-                onChange={(e) =>
-                  setDuration(Number(e.target.value))
-                }
-                className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm"
-              />
-            </div>
-          </div>
-        </div>
+<div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-8">
 
-        {/* RIGHT PANEL */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm sticky top-24 h-fit">
-          <h3 className="font-semibold text-lg mb-4">
-            Résumé
-          </h3>
+{/* HEADER */}
 
-          <p className="text-sm text-slate-600 mb-2">
-            Type: {managementType}
-          </p>
+<div>
 
-          <p className="text-sm text-slate-600 mb-2">
-            Commission: {commission}%
-          </p>
+<p className="text-xs font-semibold text-orange-500 uppercase">
+Immobilier
+</p>
 
-          <p className="text-sm text-slate-600">
-            Durée: {duration} mois
-          </p>
+<h1 className="text-2xl font-semibold mt-1">
+Gestion Airbnb
+</h1>
 
-          <button className="mt-6 w-full px-6 py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">
-            Publier l’offre
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+<p className="text-sm text-gray-500 mt-1">
+Trouvez un partenaire pour gérer votre bien en location courte durée.
+</p>
+
+</div>
+
+{/* PROPERTY INFO */}
+
+<div>
+
+<h2 className="text-sm font-semibold mb-4">
+Informations du bien
+</h2>
+
+<div className="grid md:grid-cols-2 gap-4">
+
+<select
+name="city"
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+>
+<option value="">Ville</option>
+<option>Casablanca</option>
+<option>Marrakech</option>
+<option>Rabat</option>
+<option>Tanger</option>
+<option>Agadir</option>
+</select>
+
+<input
+type="text"
+name="district"
+placeholder="Quartier (optionnel)"
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+/>
+
+<select
+name="propertyType"
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+>
+<option value="">Type de bien</option>
+<option>Appartement</option>
+<option>Villa</option>
+<option>Riad</option>
+<option>Studio</option>
+</select>
+
+<select
+name="rooms"
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+>
+<option value="">Chambres</option>
+<option>Studio</option>
+<option>1 chambre</option>
+<option>2 chambres</option>
+<option>3 chambres</option>
+<option>4+</option>
+</select>
+
+</div>
+
+</div>
+
+<hr className="border-gray-100"/>
+
+{/* AIRBNB MANAGEMENT */}
+
+<div className="space-y-4">
+
+<h2 className="text-sm font-semibold">
+Gestion Airbnb
+</h2>
+
+<select
+name="revenue"
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
+>
+
+<option value="">Revenu mensuel estimé</option>
+<option>Je ne sais pas</option>
+<option>Moins de 10 000 DH</option>
+<option>10 000 - 20 000 DH</option>
+<option>20 000 - 40 000 DH</option>
+<option>40 000+ DH</option>
+
+</select>
+
+<select
+name="managementType"
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
+>
+
+<option value="">Type de gestion</option>
+<option value="complete">Gestion complète</option>
+<option value="cohost">Co-host</option>
+<option value="discuss">À discuter</option>
+
+</select>
+
+{form.managementType && (
+
+<p className="text-xs text-gray-400">
+{getManagementDescription()}
+</p>
+
+)}
+
+{form.managementType !== "discuss" && form.managementType && (
+
+<select
+name="commission"
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
+>
+
+<option value="">Commission</option>
+<option>10%</option>
+<option>15%</option>
+<option>20%</option>
+<option>25%</option>
+<option>30%</option>
+
+</select>
+
+)}
+
+<input
+type="text"
+name="airbnbLink"
+placeholder="Lien Airbnb (optionnel)"
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
+/>
+
+<p className="text-xs text-gray-400">
+Ajoutez le lien si votre bien est déjà publié sur Airbnb.
+</p>
+
+</div>
+
+<hr className="border-gray-100"/>
+
+{/* DESCRIPTION */}
+
+<div>
+
+<h2 className="text-sm font-semibold mb-4">
+Description
+</h2>
+
+<input
+name="title"
+placeholder="Titre de l’opportunité"
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full mb-3"
+/>
+
+<textarea
+name="description"
+rows={4}
+placeholder="Décrivez votre projet..."
+onChange={handleChange}
+className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
+/>
+
+</div>
+
+{/* BUTTON */}
+
+<div className="flex justify-end pt-4 border-t border-gray-100">
+
+<button className="bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition">
+Publier l’opportunité
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+{/* PREVIEW */}
+
+<div className="md:col-span-4">
+
+<div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
+
+<p className="text-xs text-gray-400 mb-3">
+Aperçu de l'opportunité
+</p>
+
+<div className="space-y-3 text-sm">
+
+{form.city && <p>Ville : {form.city}</p>}
+
+{form.district && (
+<p>Quartier : {form.district}</p>
+)}
+
+{form.propertyType && (
+<p>Type : {form.propertyType}</p>
+)}
+
+{form.rooms && (
+<p>Chambres : {form.rooms}</p>
+)}
+
+{form.revenue && (
+<p>Revenu estimé : {form.revenue}</p>
+)}
+
+{form.managementType && (
+<p>
+Gestion :
+{form.managementType === "complete" && " Gestion complète"}
+{form.managementType === "cohost" && " Co-host"}
+{form.managementType === "discuss" && " À discuter"}
+</p>
+)}
+
+{form.managementType !== "discuss" && form.commission && (
+<p>Commission : {form.commission}</p>
+)}
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+);
 }

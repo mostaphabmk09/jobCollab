@@ -19,7 +19,7 @@ export default function ImmobilierMenuPage() {
       description:
         "Confiez la gestion de votre bien Airbnb à un partenaire et maximisez vos revenus.",
       icon: <Home className="w-6 h-6 text-blue-600" />,
-      path: "immobilier/airbnb",
+      path: "immobilier/gestion",
     },
     {
       title: "Sous-location",
