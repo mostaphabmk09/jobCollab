@@ -36,6 +36,12 @@ enum OpportunityType {
   IMMOBILIER
 }
 
+enum RealEstateAxis {
+  ACHAT
+  GESTION
+  SOUS_LOCATION
+}
+
 enum OpportunityStatus {
   OPEN
   CLOSED
@@ -150,13 +156,28 @@ model ImmobilierOpportunity {
   opportunityId    String @unique
   opportunity      Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
 
+  axis             RealEstateAxis
   propertyType     String
   city             String
+  district         String?
+  rooms            String?
 
-  investmentBudget Float
-  expectedROI      Float?
+  purpose          String?
+  investmentMode   String?
+  totalBudget      Float?
+  partners         Int?
+
+  revenue          String?
+  managementType   String?
+  commission       String?
+  airbnbLink       String?
+
+  maxRent          String?
+  exploitation     String?
+  tags             String[] @default([])
 
   createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 //////////////////////////////////////////////////////

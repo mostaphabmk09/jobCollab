@@ -1,400 +1,561 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import type { ChangeEvent, FormEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { BadgeCheck, BarChart3, House } from "lucide-react";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { useAuth } from "@/context/AuthContext";
+import {
+  createRealEstateOpportunity,
+  getRealEstateOpportunity,
+  updateRealEstateOpportunity,
+} from "@/lib/real-estate-api";
+
+const fieldClassName =
+  "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100";
+
+const sectionClassName =
+  "rounded-[28px] border border-slate-200/80 bg-white/90 p-6 shadow-[0_20px_50px_-35px_rgba(15,23,42,0.45)]";
+
+const initialForm = {
+  city: "",
+  district: "",
+  propertyType: "",
+  rooms: "",
+  maxRent: "",
+  exploitation: "",
+  revenue: "",
+  gestion: "",
+  title: "",
+  description: "",
+};
 
 export default function SousLocationPage() {
-
-const [form, setForm] = useState({
-city: "",
-district: "",
-propertyType: "",
-rooms: "",
-maxRent: "",
-exploitation: "",
-revenue: "",
-gestion: "",
-title: "",
-description: ""
-});
-
-const [tags, setTags] = useState<string[]>([]);
-const [showStickyProgress, setShowStickyProgress] = useState(false);
-
-useEffect(() => {
-
-const handleScroll = () => {
-setShowStickyProgress(window.scrollY > 200);
-};
-
-window.addEventListener("scroll", handleScroll);
-
-return () => window.removeEventListener("scroll", handleScroll);
-
-}, []);
-
-const handleChange = (e:any) => {
-setForm({
-...form,
-[e.target.name]: e.target.value
-});
-};
-
-const toggleTag = (tag:string) => {
-
-if(tags.includes(tag)){
-setTags(tags.filter(t => t !== tag));
-}
-else if(tags.length < 3){
-setTags([...tags, tag]);
-}
-
-};
-
-const availableTags = [
-"Paiement garanti",
-"Gestion professionnelle",
-"Expérience Airbnb",
-"Optimisation revenus",
-"Projet long terme",
-"Partenaire sérieux"
-];
-
-/* progress calculation */
-
-const filledFields = [
-form.city,
-form.propertyType,
-form.rooms,
-form.maxRent,
-form.exploitation,
-form.title,
-form.description
-].filter(Boolean).length;
-
-const totalFields = 7;
-
-const progress = Math.round((filledFields / totalFields) * 100);
-
-const progressColor =
-progress < 40
-? "bg-red-400"
-: progress < 70
-? "bg-yellow-400"
-: "bg-green-500";
-
-return (
-
-<div className="bg-gray-50 min-h-screen py-10 px-6">
-
-{/* MINI STICKY PROGRESS */}
-
-{showStickyProgress && (
-
-<div className="fixed top-16 left-0 w-full bg-white border-b z-50 px-6 py-2">
-
-<div className="max-w-7xl mx-auto flex items-center gap-4">
-
-<span className="text-xs text-gray-500">
-Progression {progress}%
-</span>
-
-<div className="flex-1 bg-gray-200 h-1.5 rounded-full">
-
-<div
-className={`h-1.5 rounded-full ${progressColor}`}
-style={{ width: `${progress}%` }}
-/>
-
-</div>
-
-</div>
-
-</div>
-
-)}
-
-<div className="max-w-7xl mx-auto grid md:grid-cols-12 gap-8">
-
-{/* FORM */}
-
-<div className="md:col-span-8">
-
-<div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-8">
-
-{/* HEADER */}
-
-<div>
-
-<p className="text-xs font-semibold text-orange-500 uppercase">
-Immobilier
-</p>
-
-<h1 className="text-2xl font-semibold mt-1">
-Recherche appartement pour sous-location
-</h1>
-
-<p className="text-sm text-gray-500 mt-1">
-Publiez une annonce pour trouver un propriétaire prêt à louer son bien pour exploitation Airbnb.
-</p>
-
-</div>
-
-{/* PROGRESS */}
-
-<div className="bg-gray-50 border border-gray-100 rounded-xl p-4">
-
-<div className="flex justify-between text-xs text-gray-500 mb-2">
-<span>Complétude de l'annonce</span>
-<span>{progress}%</span>
-</div>
-
-<div className="bg-gray-200 rounded-full h-2">
-
-<div
-className={`h-2 rounded-full ${progressColor}`}
-style={{ width: `${progress}%` }}
-/>
-
-</div>
-
-<p className="text-xs text-gray-400 mt-2">
-Complétez votre annonce pour améliorer sa visibilité.
-</p>
-
-</div>
-
-{/* BIEN RECHERCHÉ */}
-
-<div>
-
-<h2 className="text-sm font-semibold mb-4">
-Bien recherché
-</h2>
-
-<div className="grid md:grid-cols-2 gap-4">
-
-<select
-name="city"
-onChange={handleChange}
-className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
->
-<option value="">Ville</option>
-<option>Casablanca</option>
-<option>Marrakech</option>
-<option>Rabat</option>
-<option>Tanger</option>
-<option>Agadir</option>
-</select>
-
-<input
-name="district"
-placeholder="Quartier"
-onChange={handleChange}
-className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
-/>
-
-<select
-name="propertyType"
-onChange={handleChange}
-className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
->
-<option value="">Type de bien</option>
-<option>Peu importe</option>
-<option>Appartement</option>
-<option>Villa</option>
-<option>Riad</option>
-<option>Studio</option>
-</select>
-
-<select
-name="rooms"
-onChange={handleChange}
-className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
->
-<option value="">Chambres</option>
-<option>Peu importe</option>
-<option>Studio</option>
-<option>1 chambre</option>
-<option>2 chambres</option>
-<option>3 chambres</option>
-<option>4+</option>
-</select>
-
-</div>
-
-</div>
-
-<hr className="border-gray-100"/>
-
-{/* BUDGET */}
-
-<div>
-
-<h2 className="text-sm font-semibold mb-4">
-Budget location
-</h2>
-
-<select
-name="maxRent"
-onChange={handleChange}
-className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
->
-<option value="">Loyer maximum</option>
-<option>3000 - 5000 DH</option>
-<option>5000 - 8000 DH</option>
-<option>8000 - 12000 DH</option>
-<option>12000+ DH</option>
-</select>
-
-</div>
-
-{/* EXPLOITATION */}
-
-<div className="grid md:grid-cols-2 gap-4">
-
-<select
-name="exploitation"
-onChange={handleChange}
-className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
->
-<option value="">Type exploitation</option>
-<option>Airbnb</option>
-<option>Location courte durée</option>
-<option>Mixte</option>
-</select>
-
-<select
-name="revenue"
-onChange={handleChange}
-className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
->
-<option value="">Revenu estimé</option>
-<option>Je ne sais pas</option>
-<option>10k - 20k</option>
-<option>20k - 40k</option>
-<option>40k+</option>
-</select>
-
-</div>
-
-{/* TAGS */}
-
-<div>
-
-<h2 className="text-sm font-semibold mb-1">
-Mettez en avant votre projet
-</h2>
-
-<p className="text-xs text-gray-400 mb-4">
-Sélectionnez jusqu’à 3 éléments qui seront affichés sur votre annonce.
-</p>
-
-<div className="flex flex-wrap gap-2">
-
-{availableTags.map(tag => (
-
-<button
-key={tag}
-type="button"
-onClick={() => toggleTag(tag)}
-className={`px-3 py-1 text-xs rounded-full border
-${tags.includes(tag)
-? "bg-blue-100 text-blue-700 border-blue-200"
-: "bg-gray-100 text-gray-600 border-gray-200"}`}
->
-
-{tag}
-
-</button>
-
-))}
-
-</div>
-
-</div>
-
-{/* DESCRIPTION */}
-
-<div>
-
-<input
-name="title"
-placeholder="Titre de l’annonce"
-onChange={handleChange}
-className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full mb-3"
-/>
-
-<textarea
-name="description"
-rows={4}
-placeholder="Décrivez votre recherche..."
-onChange={handleChange}
-className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
-/>
-
-</div>
-
-{/* BUTTON */}
-
-<div className="flex justify-end pt-4 border-t border-gray-100">
-
-<button className="bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition">
-Publier l’opportunité
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-{/* PREVIEW */}
-
-<div className="md:col-span-4">
-
-<div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
-
-<p className="text-xs text-gray-400 mb-3">
-Aperçu de l'annonce
-</p>
-
-<div className="space-y-2 text-sm">
-
-{form.city && <p>Ville : {form.city}</p>}
-{form.propertyType && <p>Type : {form.propertyType}</p>}
-{form.rooms && <p>Chambres : {form.rooms}</p>}
-{form.maxRent && <p>Loyer max : {form.maxRent}</p>}
-
-{tags.length > 0 && (
-
-<div className="flex flex-wrap gap-2 pt-2">
-
-{tags.map(tag => (
-
-<span
-key={tag}
-className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
->
-
-{tag}
-
-</span>
-
-))}
-
-</div>
-
-)}
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-);
+  const { accessToken } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const opportunityId =
+    searchParams.get("id") || searchParams.get("opportunityId");
+
+  const [form, setForm] = useState(initialForm);
+  const [tags, setTags] = useState<string[]>([]);
+  const [showStickyProgress, setShowStickyProgress] = useState(false);
+  const [isLoadingOpportunity, setIsLoadingOpportunity] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const isEditMode = Boolean(opportunityId);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowStickyProgress(window.scrollY > 200);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+  ) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  useEffect(() => {
+    if (!accessToken || !opportunityId) {
+      return;
+    }
+
+    let ignore = false;
+
+    const loadOpportunity = async () => {
+      setIsLoadingOpportunity(true);
+      setError(null);
+
+      try {
+        const opportunity = await getRealEstateOpportunity(
+          opportunityId,
+          accessToken,
+        );
+
+        if (ignore) {
+          return;
+        }
+
+        setForm({
+          city: opportunity.immobilier.city ?? "",
+          district: opportunity.immobilier.district ?? "",
+          propertyType: opportunity.immobilier.propertyType ?? "",
+          rooms: opportunity.immobilier.rooms ?? "",
+          maxRent: opportunity.immobilier.maxRent ?? "",
+          exploitation: opportunity.immobilier.exploitation ?? "",
+          revenue: opportunity.immobilier.revenue ?? "",
+          gestion: "",
+          title: opportunity.title ?? "",
+          description: opportunity.description ?? "",
+        });
+        setTags(opportunity.immobilier.tags ?? []);
+      } catch (err) {
+        if (!ignore) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Impossible de charger l'opportunite.",
+          );
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoadingOpportunity(false);
+        }
+      }
+    };
+
+    loadOpportunity();
+
+    return () => {
+      ignore = true;
+    };
+  }, [accessToken, opportunityId]);
+
+  const toggleTag = (tag: string) => {
+    if (tags.includes(tag)) {
+      setTags(tags.filter((t) => t !== tag));
+    } else if (tags.length < 3) {
+      setTags([...tags, tag]);
+    }
+  };
+
+  const availableTags = [
+    "Paiement garanti",
+    "Gestion professionnelle",
+    "Experience Airbnb",
+    "Optimisation revenus",
+    "Projet long terme",
+    "Partenaire serieux",
+  ];
+
+  const filledFields = [
+    form.city,
+    form.propertyType,
+    form.rooms,
+    form.maxRent,
+    form.exploitation,
+    form.title,
+    form.description,
+  ].filter(Boolean).length;
+
+  const totalFields = 7;
+  const progress = Math.round((filledFields / totalFields) * 100);
+
+  const progressColor =
+    progress < 40 ? "bg-red-400" : progress < 70 ? "bg-yellow-400" : "bg-green-500";
+
+  const submitLabel = useMemo(() => {
+    if (isSubmitting) {
+      return isEditMode ? "Mise a jour..." : "Publication...";
+    }
+
+    return isEditMode
+      ? "Mettre a jour l'opportunite"
+      : "Publier l'opportunite";
+  }, [isEditMode, isSubmitting]);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!accessToken) {
+      setError("Vous devez etre connecte pour publier.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    const payload = {
+      axis: "SOUS_LOCATION" as const,
+      title: form.title,
+      description: form.description,
+      city: form.city,
+      district: form.district || undefined,
+      propertyType: form.propertyType,
+      rooms: form.rooms || undefined,
+      maxRent: form.maxRent || undefined,
+      exploitation: form.exploitation || undefined,
+      revenue: form.revenue || undefined,
+      tags,
+    };
+
+    try {
+      const result = isEditMode
+        ? await updateRealEstateOpportunity(opportunityId!, payload, accessToken)
+        : await createRealEstateOpportunity(payload, accessToken);
+
+      setSuccessMessage(
+        isEditMode
+          ? "Opportunite mise a jour avec succes."
+          : "Opportunite creee avec succes.",
+      );
+
+      if (!isEditMode) {
+        router.replace(`${pathname}?id=${result.id}`);
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Une erreur est survenue pendant l'envoi.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <ProtectedRoute>
+      <main className="min-h-screen bg-[radial-gradient(circle_at_top,#dcfce7_0%,#eff6ff_36%,#ecfeff_100%)] px-6 py-10">
+        {showStickyProgress && (
+          <div className="fixed left-0 top-16 z-50 w-full border-b border-emerald-100 bg-white/95 px-6 py-3 backdrop-blur">
+            <div className="mx-auto flex max-w-7xl items-center gap-4">
+              <span className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">
+                Progression {progress}%
+              </span>
+              <div className="h-2 flex-1 rounded-full bg-slate-200">
+                <div
+                  className={`h-2 rounded-full ${progressColor}`}
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-12">
+          <div className="space-y-6 md:col-span-8">
+            <section className="overflow-hidden rounded-[32px] border border-white/80 bg-[linear-gradient(135deg,#052e16_0%,#14532d_35%,#0f172a_100%)] p-8 text-white shadow-[0_28px_80px_-40px_rgba(15,23,42,0.6)]">
+              <div className="grid gap-6 md:grid-cols-[1.2fr_0.8fr] md:items-end">
+                <div className="space-y-4">
+                  <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-emerald-200">
+                    Immobilier
+                  </span>
+                  <div className="space-y-3">
+                    <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+                      {isEditMode
+                        ? "Modifier une annonce de sous-location"
+                        : "Recherche appartement pour sous-location"}
+                    </h1>
+                    <p className="max-w-xl text-sm leading-6 text-emerald-50/80">
+                      Le formulaire garde exactement ses attributs, avec un design
+                      plus structure et un suivi de progression plus propre.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-3 rounded-[28px] border border-white/10 bg-white/5 p-5 text-sm text-slate-100">
+                  <div className="flex items-center gap-3">
+                    <House className="h-5 w-5 text-emerald-200" />
+                    <span>Bloc bien recherche plus lisible</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <BarChart3 className="h-5 w-5 text-emerald-200" />
+                    <span>Progression mieux mise en scene</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <BadgeCheck className="h-5 w-5 text-emerald-200" />
+                    <span>Tags conserves avec meilleure selection</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <form onSubmit={handleSubmit} className={`${sectionClassName} space-y-8`}>
+              {isLoadingOpportunity && (
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                  Chargement de l&apos;opportunite...
+                </div>
+              )}
+
+              {error && (
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {error}
+                </div>
+              )}
+
+              {successMessage && (
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                  {successMessage}
+                </div>
+              )}
+
+              <div className="rounded-[24px] border border-emerald-100 bg-emerald-50/70 p-5">
+                <div className="mb-3 flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                  <span>Completude de l&apos;annonce</span>
+                  <span>{progress}%</span>
+                </div>
+                <div className="h-2 rounded-full bg-emerald-100">
+                  <div
+                    className={`h-2 rounded-full ${progressColor}`}
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  Completez votre annonce pour ameliorer sa visibilite.
+                </p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                    Recherche
+                  </p>
+                  <h2 className="text-xl font-semibold text-slate-950">
+                    Bien recherche
+                  </h2>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <select
+                    name="city"
+                    value={form.city}
+                    onChange={handleChange}
+                    className={fieldClassName}
+                    required
+                  >
+                    <option value="">Ville</option>
+                    <option>Casablanca</option>
+                    <option>Marrakech</option>
+                    <option>Rabat</option>
+                    <option>Tanger</option>
+                    <option>Agadir</option>
+                  </select>
+
+                  <input
+                    name="district"
+                    value={form.district}
+                    placeholder="Quartier"
+                    onChange={handleChange}
+                    className={fieldClassName}
+                  />
+
+                  <select
+                    name="propertyType"
+                    value={form.propertyType}
+                    onChange={handleChange}
+                    className={fieldClassName}
+                    required
+                  >
+                    <option value="">Type de bien</option>
+                    <option>Peu importe</option>
+                    <option>Appartement</option>
+                    <option>Villa</option>
+                    <option>Riad</option>
+                    <option>Studio</option>
+                  </select>
+
+                  <select
+                    name="rooms"
+                    value={form.rooms}
+                    onChange={handleChange}
+                    className={fieldClassName}
+                  >
+                    <option value="">Chambres</option>
+                    <option>Peu importe</option>
+                    <option>Studio</option>
+                    <option>1 chambre</option>
+                    <option>2 chambres</option>
+                    <option>3 chambres</option>
+                    <option>4+</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+
+              <div className="grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                    Budget
+                  </p>
+                  <h2 className="text-xl font-semibold text-slate-950">
+                    Budget location
+                  </h2>
+                </div>
+
+                <select
+                  name="maxRent"
+                  value={form.maxRent}
+                  onChange={handleChange}
+                  className={fieldClassName}
+                >
+                  <option value="">Loyer maximum</option>
+                  <option>3000 - 5000 DH</option>
+                  <option>5000 - 8000 DH</option>
+                  <option>8000 - 12000 DH</option>
+                  <option>12000+ DH</option>
+                </select>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                    Exploitation
+                  </p>
+                  <h2 className="text-xl font-semibold text-slate-950">
+                    Strategie
+                  </h2>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <select
+                    name="exploitation"
+                    value={form.exploitation}
+                    onChange={handleChange}
+                    className={fieldClassName}
+                  >
+                    <option value="">Type exploitation</option>
+                    <option>Airbnb</option>
+                    <option>Location courte duree</option>
+                    <option>Mixte</option>
+                  </select>
+
+                  <select
+                    name="revenue"
+                    value={form.revenue}
+                    onChange={handleChange}
+                    className={fieldClassName}
+                  >
+                    <option value="">Revenu estime</option>
+                    <option>Je ne sais pas</option>
+                    <option>10k - 20k</option>
+                    <option>20k - 40k</option>
+                    <option>40k+</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+
+              <div className="grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                    Visibilite
+                  </p>
+                  <h2 className="text-xl font-semibold text-slate-950">
+                    Mettez en avant votre projet
+                  </h2>
+                  <p className="text-sm leading-6 text-slate-500">
+                    Selectionnez jusqu a 3 elements qui seront affiches sur votre
+                    annonce.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {availableTags.map((tag) => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => toggleTag(tag)}
+                      className={`rounded-full border px-4 py-2 text-xs font-medium transition ${
+                        tags.includes(tag)
+                          ? "border-emerald-300 bg-emerald-100 text-emerald-800"
+                          : "border-slate-200 bg-slate-50 text-slate-600"
+                      }`}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+
+              <div className="grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                    Annonce
+                  </p>
+                  <h2 className="text-xl font-semibold text-slate-950">
+                    Description
+                  </h2>
+                </div>
+
+                <div className="space-y-4">
+                  <input
+                    name="title"
+                    value={form.title}
+                    placeholder="Titre de l&apos;annonce"
+                    onChange={handleChange}
+                    className={fieldClassName}
+                    required
+                  />
+
+                  <textarea
+                    name="description"
+                    value={form.description}
+                    rows={5}
+                    placeholder="Decrivez votre recherche..."
+                    onChange={handleChange}
+                    className={`${fieldClassName} min-h-[140px] resize-none`}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end border-t border-slate-200 pt-6">
+                <button
+                  type="submit"
+                  disabled={isSubmitting || isLoadingOpportunity}
+                  className="rounded-2xl bg-slate-950 px-6 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {submitLabel}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <aside className="md:col-span-4">
+            <div className="sticky top-24 space-y-5">
+              <section className="overflow-hidden rounded-[28px] border border-white/80 bg-white/90 shadow-[0_24px_70px_-40px_rgba(15,23,42,0.45)]">
+                <div className="border-b border-slate-100 bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                    Apercu
+                  </p>
+                  <h3 className="mt-2 text-xl font-semibold text-slate-950">
+                    Annonce de sous-location
+                  </h3>
+                </div>
+
+                <div className="space-y-3 px-6 py-6 text-sm text-slate-700">
+                  {form.city && <p>Ville : {form.city}</p>}
+                  {form.propertyType && <p>Type : {form.propertyType}</p>}
+                  {form.rooms && <p>Chambres : {form.rooms}</p>}
+                  {form.maxRent && <p>Loyer max : {form.maxRent}</p>}
+                  {form.exploitation && <p>Exploitation : {form.exploitation}</p>}
+                  {tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 pt-2">
+                      {tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </section>
+            </div>
+          </aside>
+        </div>
+      </main>
+    </ProtectedRoute>
+  );
 }
