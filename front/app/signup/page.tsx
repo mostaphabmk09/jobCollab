@@ -1,14 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
+  const { login } = useAuth();
+  const router = useRouter();
+
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({
@@ -17,15 +24,50 @@ export default function SignupPage() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    setError(null);
+
     if (form.password !== form.confirmPassword) {
-      alert("Les mots de passe ne correspondent pas.");
+      setError("Les mots de passe ne correspondent pas.");
       return;
     }
 
-    console.log("Signup data:", form);
+    setLoading(true);
+
+    try {
+      // Register on backend
+      const res = await fetch("http://localhost:4000/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: form.name, email: form.email, password: form.password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Erreur lors de l'inscription");
+      }
+
+      // Auto-login using context helper
+      await login(form.email, form.password);
+
+      // mark that onboarding should show once after signup
+      try {
+        localStorage.setItem("show_onboarding_after_signup", "true");
+      } catch {
+        /* ignore */
+      }
+
+      // Redirect to home
+      router.push("/");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message || "Erreur réseau");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -52,6 +94,8 @@ export default function SignupPage() {
               className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
+
+          {/* (Profile details moved to onboarding/profile update) */}
 
           {/* Email */}
           <div>
@@ -99,10 +143,12 @@ export default function SignupPage() {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white hover:bg-indigo-700 transition"
+            disabled={loading}
+            className="w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white hover:bg-indigo-700 transition disabled:opacity-60"
           >
-            S'inscrire
+            S&apos;inscrire
           </button>
+          {error && <p className="text-sm text-red-600 text-center mt-2">{error}</p>}
         </form>
 
         <p className="mt-6 text-center text-sm text-slate-600">

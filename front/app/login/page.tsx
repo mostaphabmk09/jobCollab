@@ -86,7 +86,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-slate-600">
+          <div className="mt-6 text-center text-sm text-slate-600 cursor-pointer">
             Pas encore de compte ?{" "}
             <Link
               href="/signup"

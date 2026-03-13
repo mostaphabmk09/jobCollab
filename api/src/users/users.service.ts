@@ -28,4 +28,22 @@ export class UsersService {
       where: { id },
     });
   }
+  async updateProfile(userId: string, data: { profileType?: string; interests?: string[]; name?: string; phone?: string; company?: string; position?: string; website?: string; city?: string; bio?: string }) {
+    const updateData: any = {};
+    if (typeof data.profileType !== 'undefined') updateData.profileType = data.profileType as any;
+    if (typeof data.interests !== 'undefined') updateData.interests = data.interests as any;
+    if (typeof data.name !== 'undefined') updateData.name = data.name;
+    if (typeof data.phone !== 'undefined') updateData.phone = data.phone;
+    if (typeof data.company !== 'undefined') updateData.company = data.company;
+    if (typeof data.position !== 'undefined') updateData.position = data.position;
+    if (typeof data.website !== 'undefined') updateData.website = data.website;
+    if (typeof data.city !== 'undefined') updateData.city = data.city;
+    if (typeof data.bio !== 'undefined') updateData.bio = data.bio;
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+    });
+  }
+
 }

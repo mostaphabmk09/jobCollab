@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 import {
   Search,
   SlidersHorizontal,
@@ -236,8 +237,22 @@ export function OpportunitiesPage() {
   const [savedIds, setSavedIds] = useState<number[]>([]);
   const c = LIGHT_COLORS;
 
+  // default filter based on signed-in user's interests (non-destructive)
+  const { user } = useAuth();
+
+  const effectiveAxis: AxisType = (() => {
+    const u = user as { interests?: string[] } | null;
+    if (u && u.interests && u.interests.length > 0 && activeAxis === "all") {
+      const first = String(u.interests[0]).toLowerCase();
+      if (first === "collaboration" || first === "financement" || first === "immobilier") {
+        return first as AxisType;
+      }
+    }
+    return activeAxis;
+  })();
+
   const filtered = ALL_OPPORTUNITIES.filter((opp) => {
-    const matchAxis = activeAxis === "all" || opp.axis === activeAxis;
+    const matchAxis = effectiveAxis === "all" || opp.axis === effectiveAxis;
     const matchSearch =
       search === "" ||
       opp.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -564,8 +579,8 @@ export function OpportunitiesPage() {
             {filtered.length} résultat{filtered.length !== 1 ? "s" : ""}
             {search && (
               <span>
-                {" "}
-                pour "<span style={{ color: c.textMuted }}>{search}</span>"
+                {' '}
+                pour &quot;<span style={{ color: c.textMuted }}>{search}</span>&quot;
               </span>
             )}
           </p>
