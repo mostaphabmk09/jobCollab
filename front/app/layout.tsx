@@ -15,13 +15,11 @@ export default function RootLayout({
       <body className="min-h-screen bg-[#f2f4ff]">
         <AuthProvider>
           {/* Main Page Wrapper */}
-          <div className="flex min-h-[100dvh] flex-col">            
+          <div className="flex min-h-[100dvh] flex-col">
             <Navbar />
-            {/* <OnboardingGate />  */}
+            {/* <OnboardingGate /> */}
             {/* Content */}
-            <main className="flex-1 pb-24 md:pb-0">
-              {children}
-            </main>
+            <main className="flex-1 pb-24 md:pb-0">{children}</main>
 
             <Footer />
 

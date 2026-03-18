@@ -33,7 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const refreshSession = async () => {
       try {
-        const res = await fetch("http://localhost:4000/auth/refresh", {
+        const res = await fetch("http://localhost:5000/auth/refresh", {
           method: "POST",
           credentials: "include",
         });
@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const data = await res.json();
           setAccessToken(data.accessToken);
 
-          const meRes = await fetch("http://localhost:4000/users/me", {
+          const meRes = await fetch("http://localhost:5000/users/me", {
             headers: {
               Authorization: `Bearer ${data.accessToken}`,
             },
@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const res = await fetch("http://localhost:4000/auth/login", {
+    const res = await fetch("http://localhost:5000/auth/login", {
       method: "POST",
       credentials: "include",
       headers: {
@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setAccessToken(data.accessToken);
 
-    const meRes = await fetch("http://localhost:4000/users/me", {
+    const meRes = await fetch("http://localhost:5000/users/me", {
       headers: {
         Authorization: `Bearer ${data.accessToken}`,
       },
@@ -94,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    await fetch("http://localhost:4000/auth/logout", {
+    await fetch("http://localhost:5000/auth/logout", {
       method: "POST",
       credentials: "include",
     });
@@ -106,9 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   if (loading) return null;
 
   return (
-    <AuthContext.Provider
-      value={{ user, accessToken, loading, login, logout }}
-    >
+    <AuthContext.Provider value={{ user, accessToken, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

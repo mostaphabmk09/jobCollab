@@ -6,9 +6,10 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { CollaborationOpportunitiesModule } from './collaboration-opportunities/collaboration-opportunities.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule,ConfigModule.forRoot({
+  imports: [PrismaModule, AuthModule, UsersModule, CollaborationOpportunitiesModule, ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
         JWT_ACCESS_SECRET: Joi.string().min(10).required(),

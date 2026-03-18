@@ -37,7 +37,9 @@ enum OpportunityType {
 }
 
 enum OpportunityStatus {
-  OPEN
+  DRAFT
+  PUBLISHED
+  PAUSED
   CLOSED
   ARCHIVED
 }
@@ -46,6 +48,44 @@ enum ApplicationStatus {
   PENDING
   ACCEPTED
   REJECTED
+}
+
+enum ProjectStage {
+  IDEA
+  CONCEPT_VALIDATED
+  PROTOTYPE
+  MVP
+  EARLY_USERS
+  REVENUE
+}
+
+enum CollaborationType {
+  CO_FOUNDER
+  ASSOCIATE
+  STRATEGIC_PARTNER
+  OPERATIONAL_PARTNER
+  TECHNICAL_PARTNER
+}
+
+enum CollaborationNeedType {
+  FINANCEMENT
+  PLACEMENT
+  MATERIAL
+  OPERATOR
+}
+
+enum OfferType {
+  EQUITY
+  REVENUE_SHARE
+  PARTNERSHIP
+  CONTRIBUTION_BASED_SHARE
+  TO_DISCUSS
+}
+
+enum TermsFlexibility {
+  FIXED
+  NEGOTIABLE
+  VERY_FLEXIBLE
 }
 
 //////////////////////////////////////////////////////
@@ -79,19 +119,22 @@ model User {
 //////////////////////////////////////////////////////
 
 model Opportunity {
-  id          String            @id @default(uuid())
+  id                String            @id @default(uuid())
 
-  title       String
-  description String
+  title             String?
+  oneLinePitch      String?
+  description       String?           @db.Text
 
-  type        OpportunityType
+  type              OpportunityType
 
-  location    String?
+  location          String?
 
-  status      OpportunityStatus @default(OPEN)
+  status            OpportunityStatus @default(DRAFT)
+  completionPercent Int               @default(0)
+  publishedAt       DateTime?
 
-  authorId    String
-  author      User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId          String
+  author            User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   // extension tables
   collaboration CollaborationOpportunity?
@@ -101,8 +144,12 @@ model Opportunity {
   applications Application[]
   favorites    Favorite[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([authorId])
+  @@index([type])
+  @@index([status])
 }
 
 //////////////////////////////////////////////////////
@@ -110,17 +157,42 @@ model Opportunity {
 //////////////////////////////////////////////////////
 
 model CollaborationOpportunity {
-  id            String @id @default(uuid())
+  id                               String             @id @default(uuid())
 
-  opportunityId String @unique
-  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  opportunityId                    String             @unique
+  opportunity                      Opportunity        @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
 
-  equity        Float?
-  teamSize      Int?
+  projectCategory                  String?
+  projectStage                     ProjectStage?
+  requirements                     CollaborationOpportunityRequirement[]
 
-  requiredSkills String[]
+  offerType                        OfferType?
+  offerDescription                 String?            @db.Text
+  equityMin                        Float?
+  equityMax                        Float?
+  revenueShareDetails              String?            @db.Text
+  financialContributionExpected    Boolean            @default(false)
+  financialContributionDescription String?            @db.Text
+  termsFlexibility                 TermsFlexibility?
 
-  createdAt     DateTime @default(now())
+  createdAt                        DateTime           @default(now())
+  updatedAt                        DateTime           @updatedAt
+
+  @@index([projectStage])
+  @@index([offerType])
+}
+
+model CollaborationOpportunityRequirement {
+  id                           String                  @id @default(uuid())
+  collaborationOpportunityId   String
+  collaborationOpportunity     CollaborationOpportunity @relation(fields: [collaborationOpportunityId], references: [id], onDelete: Cascade)
+  collaborationType            CollaborationType
+  needTypes                    CollaborationNeedType[] @default([])
+  createdAt                    DateTime                @default(now())
+  updatedAt                    DateTime                @updatedAt
+
+  @@index([collaborationOpportunityId])
+  @@index([collaborationType])
 }
 
 //////////////////////////////////////////////////////
@@ -138,6 +210,7 @@ model FinancementOpportunity {
   revenueShare     Float?
 
   createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 //////////////////////////////////////////////////////
@@ -157,6 +230,7 @@ model ImmobilierOpportunity {
   expectedROI      Float?
 
   createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 //////////////////////////////////////////////////////

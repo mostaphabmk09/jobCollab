@@ -21,7 +21,7 @@ export default function OnboardingGate() {
   return (
     <OnboardingModal
       onComplete={async (data) => {
-        await fetch("http://localhost:4000/users/onboarding", {
+        await fetch("http://localhost:5000/users/onboarding", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
