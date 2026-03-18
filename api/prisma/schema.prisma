@@ -94,6 +94,13 @@ enum TermsFlexibility {
 
 model User {
   id           String       @id @default(uuid())
+  name         String?
+  phone        String?
+  company      String?
+  position     String?
+  website      String?
+  city         String?
+  bio          String?
   email        String       @unique
   password     String
 

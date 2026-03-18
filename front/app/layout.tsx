@@ -17,7 +17,7 @@ export default function RootLayout({
           {/* Main Page Wrapper */}
           <div className="flex min-h-[100dvh] flex-col">
             <Navbar />
-            {/* <OnboardingGate /> */}
+            <OnboardingGate />
             {/* Content */}
             <main className="flex-1 pb-24 md:pb-0">{children}</main>
 

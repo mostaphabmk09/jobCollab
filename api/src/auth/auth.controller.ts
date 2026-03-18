@@ -17,7 +17,8 @@ export class AuthController {
   @Post('register')
   @Public()
   register(@Body() dto: RegisterDto) {
-    return this.authService.register(dto.email,dto.password);
+    // keep registration minimal: only name, email, password
+    return this.authService.register(dto.email, dto.password, dto.name);
   }
 
   @Post('login')
@@ -52,18 +53,31 @@ async refresh(
     throw new UnauthorizedException('No refresh token');
   }
 
-  const tokens = await this.authService.refreshFromToken(refreshToken);
+  try {
+    const tokens = await this.authService.refreshFromToken(refreshToken);
 
-  res.cookie('refreshToken', tokens.refreshToken, {
-    httpOnly: true,
-    secure: false,
-    sameSite: 'strict',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+    // set new refresh cookie
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
 
-  return {
-    accessToken: tokens.accessToken,
-  };
+    return {
+      accessToken: tokens.accessToken,
+    };
+  } catch (err) {
+    // Refresh failed (invalid/expired refresh token) -> clear cookie so browser removes it
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      path: '/',
+    });
+    throw new UnauthorizedException('Invalid refresh token');
+  }
 }
 
 @Public()
@@ -82,11 +96,20 @@ async logout(
 
       await this.usersService.updateRefreshToken(payload.sub, null);
     } catch (err) {
-      throw new UnauthorizedException('Access denied');
+      // If the refresh token is invalid or verification fails, still proceed to clear the cookie
+      // so the client session is removed. Do not rethrow here; clearing the cookie below is sufficient.
+      // Log optionally for debugging.
+      // console.debug('Invalid refresh token during logout', err?.message || err);
     }
   }
 
-  res.clearCookie('refreshToken');
+  // Clear the refresh token cookie using the same attributes as when it was set so browsers remove it reliably
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'strict',
+    path: '/',
+  });
 
   return { message: 'Logged out successfully' };
 }

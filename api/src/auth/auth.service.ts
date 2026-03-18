@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
 export class AuthService {
   constructor(private usersService: UsersService, private jwtService: JwtService,private configService: ConfigService) {}
 
-  async register(email:string,password:string) {
+  async register(email: string, password: string, name?: string) {
     const existingUser = await this.usersService.findByEmail(email);
 
     if (existingUser) {
@@ -18,10 +18,14 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await this.usersService.create({
-      email: email,
+    const createData: any = {
+      email,
       password: hashedPassword,
-    });
+    };
+
+    if (name) createData.name = name;
+
+    const user = await this.usersService.create(createData);
 
     return {
       message: 'User created successfully',

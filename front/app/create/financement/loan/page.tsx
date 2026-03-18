@@ -5,10 +5,19 @@ import { useState } from "react";
 export default function CreateLoanFinancementPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [city, setCity] = useState("");
+  const [location, setLocation] = useState("");
+  const [industry, setIndustry] = useState("");
+  const [projectStage, setProjectStage] = useState("");
+
   const [amount, setAmount] = useState("");
+  const [minimumInvestment, setMinimumInvestment] = useState("");
+  const [fundingDeadline, setFundingDeadline] = useState("");
+
   const [duration, setDuration] = useState("");
   const [interest, setInterest] = useState("");
+
+  const [founderContribution, setFounderContribution] = useState("");
+  const [useOfFunds, setUseOfFunds] = useState("");
 
   const totalToRepay =
     amount && interest
@@ -58,44 +67,53 @@ export default function CreateLoanFinancementPage() {
             />
 
             <input
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              placeholder="Ville"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="Localisation (ville, pays)"
               className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm"
             />
+
+            <div className="grid sm:grid-cols-2 gap-3">
+              <select value={industry} onChange={(e) => setIndustry(e.target.value)} className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">
+                <option value="">Sélectionner l&apos;industrie</option>
+                <option>Food</option>
+                <option>Retail</option>
+                <option>Services</option>
+                <option>Technology</option>
+                <option>Real Estate</option>
+                <option>Fashion</option>
+                <option>Other</option>
+              </select>
+              <select value={projectStage} onChange={(e) => setProjectStage(e.target.value)} className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">
+                <option value="">Stage du projet</option>
+                <option>IDEA</option>
+                <option>STARTING</option>
+                <option>OPERATING</option>
+                <option>GROWING</option>
+              </select>
+            </div>
 
           </div>
 
           {/* Détails prêt */}
           <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
 
-            <h2 className="font-semibold text-lg">
-              Détails du prêt
-            </h2>
+            <h2 className="font-semibold text-lg">Détails du prêt</h2>
 
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="Montant recherché (MAD)"
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm"
-            />
+            <div className="grid sm:grid-cols-2 gap-3">
+              <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Montant recherché" className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm" />
+              <input type="number" value={minimumInvestment} onChange={(e) => setMinimumInvestment(e.target.value)} placeholder="Investissement minimum" className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm" />
+            </div>
 
-            <input
-              type="number"
-              value={duration}
-              onChange={(e) => setDuration(e.target.value)}
-              placeholder="Durée remboursement (mois)"
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm"
-            />
+            <div className="grid sm:grid-cols-2 gap-3 mt-3">
+              <input type="date" value={fundingDeadline} onChange={(e) => setFundingDeadline(e.target.value)} className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm" />
+              <div />
+            </div>
 
-            <input
-              type="number"
-              value={interest}
-              onChange={(e) => setInterest(e.target.value)}
-              placeholder="Intérêt total (%)"
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm"
-            />
+            <div className="grid sm:grid-cols-2 gap-3 mt-3">
+              <input type="number" value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="Durée remboursement (mois)" className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm" />
+              <input type="number" value={interest} onChange={(e) => setInterest(e.target.value)} placeholder="Taux d'intérêt (%)" className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm" />
+            </div>
 
             {totalToRepay && (
               <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 text-sm text-indigo-700">
@@ -103,12 +121,16 @@ export default function CreateLoanFinancementPage() {
                 {monthly && (
                   <>
                     <br />
-                    Mensualité estimée:{" "}
-                    <strong>{monthly} MAD</strong>
+                    Mensualité estimée: <strong>{monthly} MAD</strong>
                   </>
                 )}
               </div>
             )}
+
+            <div className="grid sm:grid-cols-2 gap-3 mt-3">
+              <input type="number" value={founderContribution} onChange={(e) => setFounderContribution(e.target.value)} placeholder="Apport fondateur ($)" className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm" />
+              <input value={useOfFunds} onChange={(e) => setUseOfFunds(e.target.value)} placeholder="Utilisation des fonds" className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm" />
+            </div>
 
           </div>
 
